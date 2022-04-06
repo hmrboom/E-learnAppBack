@@ -167,13 +167,6 @@ namespace LicentaB.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("category_name");
-
-                entity.Property(e => e.SubcategoryId).HasColumnName("Subcategory_Id");
-
-                entity.HasOne(d => d.Subcategory)
-                    .WithMany(p => p.Categories)
-                    .HasForeignKey(d => d.SubcategoryId)
-                    .HasConstraintName("FK_Category_SubCategory");
             });
 
             modelBuilder.Entity<Course>(entity =>
@@ -467,10 +460,17 @@ namespace LicentaB.Models
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
+                entity.Property(e => e.CategoryId).HasColumnName("Category_Id");
+
                 entity.Property(e => e.SubCategoryName)
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("subCategory_name");
+
+                entity.HasOne(d => d.Category)
+                    .WithMany(p => p.SubCategories)
+                    .HasForeignKey(d => d.CategoryId)
+                    .HasConstraintName("FK_SubCategory_Category");
             });
 
             modelBuilder.Entity<Test>(entity =>

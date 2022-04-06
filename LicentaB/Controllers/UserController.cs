@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using BC = BCrypt.Net.BCrypt;
 namespace LicentaB.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("user/")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -103,8 +103,68 @@ namespace LicentaB.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        [HttpGet("getUser")]
+        public ActionResult<AspNetUser> GetById(Guid Id)
+        {
+            return _db.AspNetUsers.Where(user => Id == user.Id).Single();
+        }
+
+        [HttpPost("updateUser")]
+        public ActionResult<AspNetUser> Update([FromBody] UserUpdatePayload payload)
+        {
+            try
+            {
+                if (payload.Id.HasValue)
+                {
+                    var userToUpdate = _db.AspNetUsers.SingleOrDefault(user => payload.Id.Value == user.Id);
+
+                    userToUpdate.FirstName = payload.First_Name;
+                    userToUpdate.LastName = payload.Last_Name;
+                    userToUpdate.Email = payload.Email;
+                    userToUpdate.Gender = payload.Gender;
+                    userToUpdate.PhoneNumber = payload.Phone;
+                    userToUpdate.UserName = payload.UserName;
 
 
+                    _db.SaveChanges();
+                    return Ok(userToUpdate);
+                }
+                else
+                {
+                    return new StatusCodeResult(StatusCodes.Status400BadRequest);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
+        [HttpPost("changePass")]
+        public ActionResult<AspNetUser> Update([FromBody] ChangePasswordPayload payload)
+        {
+            try
+            {
+                if (payload.Id.HasValue)
+                {
+                    var userToUpdate = _db.AspNetUsers.SingleOrDefault(user => payload.Id.Value == user.Id);
+
+                    if(BC.Verify(payload.OldPassword, userToUpdate.PasswordHash))
+                    {
+                        userToUpdate.PasswordHash = BC.HashPassword(payload.NewPassword);
+                        _db.SaveChanges();
+                        return Ok(userToUpdate);
+                    }
+   
+                }
+               
+                 return new StatusCodeResult(StatusCodes.Status400BadRequest);
+                
+            }
+            catch (Exception ex)
+            {
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
 
 
     }

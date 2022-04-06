@@ -10,13 +10,13 @@ namespace LicentaB.Models
         public Category()
         {
             Courses = new HashSet<Course>();
+            SubCategories = new HashSet<SubCategory>();
         }
 
         public Guid Id { get; set; }
         public string CategoryName { get; set; }
-        public Guid? SubcategoryId { get; set; }
 
-        public virtual SubCategory Subcategory { get; set; }
         public virtual ICollection<Course> Courses { get; set; }
+        public virtual ICollection<SubCategory> SubCategories { get; set; }
     }
 }

@@ -7,14 +7,10 @@ namespace LicentaB.Models
 {
     public partial class SubCategory
     {
-        public SubCategory()
-        {
-            Categories = new HashSet<Category>();
-        }
-
         public Guid Id { get; set; }
         public string SubCategoryName { get; set; }
+        public Guid? CategoryId { get; set; }
 
-        public virtual ICollection<Category> Categories { get; set; }
+        public virtual Category Category { get; set; }
     }
 }
