@@ -4,6 +4,7 @@ using LicentaB.Payloads;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -106,7 +107,10 @@ namespace LicentaB.Controllers
         [HttpGet("getUser")]
         public ActionResult<AspNetUser> GetById(Guid Id)
         {
-            return _db.AspNetUsers.Where(user => Id == user.Id).Single();
+            return _db.AspNetUsers.Include(user => user.Courses)
+                .Include(enroll=>enroll.StudentEnrolments)
+                .Include(wish=>wish.WishLists).ThenInclude(course=>course.Course)
+                .Where(user => Id == user.Id).Single();
         }
 
         [HttpPost("updateUser")]

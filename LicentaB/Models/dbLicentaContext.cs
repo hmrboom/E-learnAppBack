@@ -27,7 +27,6 @@ namespace LicentaB.Models
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Course> Courses { get; set; }
         public virtual DbSet<CourseCertificate> CourseCertificates { get; set; }
-        public virtual DbSet<CourseCreate> CourseCreates { get; set; }
         public virtual DbSet<CourseReview> CourseReviews { get; set; }
         public virtual DbSet<CourseType> CourseTypes { get; set; }
         public virtual DbSet<Lesson> Lessons { get; set; }
@@ -99,6 +98,10 @@ namespace LicentaB.Models
                 entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
 
                 entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
+
+                entity.Property(e => e.Role)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UserName).HasMaxLength(256);
             });
@@ -221,11 +224,6 @@ namespace LicentaB.Models
                     .WithMany(p => p.Courses)
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("FK_Course_AspNetUsers");
-
-                entity.HasOne(d => d.UserNavigation)
-                    .WithMany(p => p.Courses)
-                    .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK_Course_Course_Create");
             });
 
             modelBuilder.Entity<CourseCertificate>(entity =>
@@ -250,24 +248,6 @@ namespace LicentaB.Models
                     .WithMany(p => p.CourseCertificates)
                     .HasForeignKey(d => d.CourseId)
                     .HasConstraintName("FK_Course_Certificate_Course");
-            });
-
-            modelBuilder.Entity<CourseCreate>(entity =>
-            {
-                entity.ToTable("Course_Create");
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.Property(e => e.DataCreation)
-                    .HasColumnType("date")
-                    .HasColumnName("data_creation");
-
-                entity.Property(e => e.UserId).HasColumnName("User_Id");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.CourseCreates)
-                    .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK_Course_Create_AspNetUsers");
             });
 
             modelBuilder.Entity<CourseReview>(entity =>

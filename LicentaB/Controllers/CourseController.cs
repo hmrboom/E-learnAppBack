@@ -81,7 +81,7 @@ namespace LicentaB.Controllers
         {
             try
             {
-                return _db.Categories.Include(c => c.SubCategories).ToList();
+                return _db.Categories.Include(course => course.Courses).Include(c => c.SubCategories).ToList();
 
             }
             catch(Exception e)
@@ -94,7 +94,7 @@ namespace LicentaB.Controllers
         {
             try
             {
-                return _db.Courses.Include(c => c.User)
+                return _db.Courses.Include(module => module.Modules).Include(c => c.User)
                     .ToList();
 
             }
@@ -186,6 +186,80 @@ namespace LicentaB.Controllers
                 return new JsonResult(new { err = e.Message });
             }
         }
+        [HttpGet("getCourseById")]
+        public ActionResult<Course> GetById(Guid Id)
+        {
+            return _db.Courses
+                .Include(module => module.Modules)
+                .ThenInclude(les=>les.Lessons)
+                .Where(course => Id == course.Id)
+                .Single();
+        }
+        [HttpPost("goToWishlist")]
+        public async Task<IActionResult> AddToWish([FromBody] WishListPayload createPayload)
+        {
+            try
+            {
+                var wishList = new WishList
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = createPayload.UserId,
+                    CourseId = createPayload.CourseId
+                };
+                var foundCourse = _db.WishLists
+              .SingleOrDefault(u => u.CourseId == wishList.CourseId);
+                if (foundCourse == null)
+                {
+
+
+                    _db.WishLists.Add(wishList);
+                    _db.SaveChanges();
+                    return Ok(new { status = true, message = "wishlist Creat" });
+                }
+                else return Ok(new { status = true, message = "nu mere" });
+            }
+            catch (Exception e)
+            {
+                return new JsonResult(new { err = e.Message });
+            }
+        }
+        [HttpPost("payCourse")]
+        public async Task<IActionResult> PayCourse([FromBody] EnrolmentPayload createPayload)
+        {
+            try
+            {
+                DateTime date = DateTime.UtcNow;
+               
+                var payment = new StudentEnrolment
+                {
+                    Id = Guid.NewGuid(),
+                    DateEnrolment = date,
+                    UserId = createPayload.UserId,
+                    CourseId = createPayload.CourseId,
+                    PaymentTypeId = createPayload.PaymentTypeId
+                };
+                var foundCourse = _db.StudentEnrolments
+              .SingleOrDefault(u => u.CourseId == payment.CourseId);
+                if (foundCourse == null)
+                {
+
+
+                    _db.StudentEnrolments.Add(payment);
+                    
+                   WishList course = _db.WishLists.Where(courseId => courseId.CourseId == payment.CourseId).First();
+                    _db.WishLists.Remove(course);
+                    _db.SaveChanges();
+
+                    return Ok(new { status = true, message = "Student Inrolat" });
+                }
+                else return Ok(new { status = true, message = "nu mere" });
+            }
+            catch (Exception e)
+            {
+                return new JsonResult(new { err = e.Message });
+            }
+        }
+
 
     }
 }

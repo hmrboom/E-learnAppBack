@@ -31,7 +31,6 @@ namespace LicentaB.Models
         public virtual Category Category { get; set; }
         public virtual CourseType CourseType { get; set; }
         public virtual AspNetUser User { get; set; }
-        public virtual CourseCreate UserNavigation { get; set; }
         public virtual ICollection<CourseCertificate> CourseCertificates { get; set; }
         public virtual ICollection<CourseReview> CourseReviews { get; set; }
         public virtual ICollection<Module> Modules { get; set; }

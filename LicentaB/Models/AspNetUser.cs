@@ -12,7 +12,6 @@ namespace LicentaB.Models
             AspNetUserClaims = new HashSet<AspNetUserClaim>();
             AspNetUserLogins = new HashSet<AspNetUserLogin>();
             AspNetUserTokens = new HashSet<AspNetUserToken>();
-            CourseCreates = new HashSet<CourseCreate>();
             CourseReviews = new HashSet<CourseReview>();
             Courses = new HashSet<Course>();
             StudentEnrolments = new HashSet<StudentEnrolment>();
@@ -37,11 +36,11 @@ namespace LicentaB.Models
         public bool? Gender { get; set; }
         public string LastName { get; set; }
         public string FirstName { get; set; }
+        public string Role { get; set; }
 
         public virtual ICollection<AspNetUserClaim> AspNetUserClaims { get; set; }
         public virtual ICollection<AspNetUserLogin> AspNetUserLogins { get; set; }
         public virtual ICollection<AspNetUserToken> AspNetUserTokens { get; set; }
-        public virtual ICollection<CourseCreate> CourseCreates { get; set; }
         public virtual ICollection<CourseReview> CourseReviews { get; set; }
         public virtual ICollection<Course> Courses { get; set; }
         public virtual ICollection<StudentEnrolment> StudentEnrolments { get; set; }
