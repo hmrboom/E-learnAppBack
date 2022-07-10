@@ -27,6 +27,7 @@ namespace LicentaB.Models
         public string CourseRequirement { get; set; }
         public Guid? CategoryId { get; set; }
         public Guid? UserId { get; set; }
+        public string CoursePhoto { get; set; }
 
         public virtual Category Category { get; set; }
         public virtual CourseType CourseType { get; set; }

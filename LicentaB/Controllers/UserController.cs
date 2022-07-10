@@ -108,11 +108,35 @@ namespace LicentaB.Controllers
         public ActionResult<AspNetUser> GetById(Guid Id)
         {
             return _db.AspNetUsers.Include(user => user.Courses)
-                .Include(enroll=>enroll.StudentEnrolments)
+                .Include(enroll=>enroll.StudentEnrolments).ThenInclude(course => course.Course)
                 .Include(wish=>wish.WishLists).ThenInclude(course=>course.Course)
                 .Where(user => Id == user.Id).Single();
         }
+        [HttpPost("userPhotoModify")]
+        public async Task<IActionResult> UserPhotoModify([FromBody] UserPhotoModify user)
+        {
+            try
+            {
+                if (user.Id.HasValue)
+                {
+                    var userUpdate = _db.AspNetUsers.SingleOrDefault(c => user.Id.Value == c.Id);
 
+                    userUpdate.ProfilePhoto = user.ProfilePhoto;
+
+
+                    _db.SaveChanges();
+                    return Ok(userUpdate);
+                }
+                else
+                {
+                    return new StatusCodeResult(StatusCodes.Status400BadRequest);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
         [HttpPost("updateUser")]
         public ActionResult<AspNetUser> Update([FromBody] UserUpdatePayload payload)
         {
@@ -125,7 +149,6 @@ namespace LicentaB.Controllers
                     userToUpdate.FirstName = payload.First_Name;
                     userToUpdate.LastName = payload.Last_Name;
                     userToUpdate.Email = payload.Email;
-                    userToUpdate.Gender = payload.Gender;
                     userToUpdate.PhoneNumber = payload.Phone;
                     userToUpdate.UserName = payload.UserName;
 

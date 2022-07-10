@@ -13,8 +13,6 @@ namespace LicentaB.Payloads
         public string First_Name { get; set; }
         
         public string Last_Name { get; set; }
-        
-        public bool Gender { get; set; }
 
         public string Phone { get; set; }
         public string UserName { get; set; }

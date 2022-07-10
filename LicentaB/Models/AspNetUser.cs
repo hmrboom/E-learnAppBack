@@ -37,6 +37,7 @@ namespace LicentaB.Models
         public string LastName { get; set; }
         public string FirstName { get; set; }
         public string Role { get; set; }
+        public string ProfilePhoto { get; set; }
 
         public virtual ICollection<AspNetUserClaim> AspNetUserClaims { get; set; }
         public virtual ICollection<AspNetUserLogin> AspNetUserLogins { get; set; }

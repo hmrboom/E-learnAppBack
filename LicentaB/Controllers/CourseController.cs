@@ -1,5 +1,6 @@
 ﻿using LicentaB.Models;
 using LicentaB.Payloads;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -116,6 +117,31 @@ namespace LicentaB.Controllers
                 return new JsonResult(new { err = e.Message });
             }
         }
+        [HttpPost("coursePhotoModify")]
+        public async Task<IActionResult> CoursePhotoModify([FromBody] CoursePhotoModify course)
+        {
+            try
+            {
+                if (course.Id.HasValue)
+                {
+                    var courseUpdate = _db.Courses.SingleOrDefault(c => course.Id.Value == c.Id);
+
+                    courseUpdate.CoursePhoto = course.CoursePhoto;
+
+
+                    _db.SaveChanges();
+                    return Ok(courseUpdate);
+                }
+                else
+                {
+                    return new StatusCodeResult(StatusCodes.Status400BadRequest);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
         [HttpPost("courseCreation")]
         public async Task<IActionResult> CourseCreate([FromBody] CourseCreationPayload createPayload)
         {
@@ -186,6 +212,39 @@ namespace LicentaB.Controllers
                 return new JsonResult(new { err = e.Message });
             }
         }
+        [HttpPost("lessonCreate")]
+        public async Task<IActionResult> LessCreate([FromBody] CreateLessonPayload createPayload)
+        {
+            try
+            {
+                
+                var lessonCreate = new Lesson
+                {
+                    Id = Guid.NewGuid(),
+                    LessonName = createPayload.LessonName,
+                    LessonPdf = createPayload.pdfPath,
+                    LessonVideoPath = createPayload.videoPath,
+                    ModuleId = createPayload.ModuleId,
+                    LessonLiveStreamDate = createPayload.liveStreamDate
+
+                };
+                
+
+               
+                    _db.Lessons.Add(lessonCreate);
+                    _db.SaveChanges();
+                    return Ok(new { status = true, message = "Lesson Creat" });
+             
+               
+
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.InnerException.Message);
+                return new JsonResult(new { err = e.Message });
+            }
+        }
         [HttpGet("getCourseById")]
         public ActionResult<Course> GetById(Guid Id)
         {
@@ -207,7 +266,7 @@ namespace LicentaB.Controllers
                     CourseId = createPayload.CourseId
                 };
                 var foundCourse = _db.WishLists
-              .SingleOrDefault(u => u.CourseId == wishList.CourseId);
+              .SingleOrDefault(u => u.CourseId == wishList.CourseId && u.UserId == wishList.UserId);
                 if (foundCourse == null)
                 {
 
@@ -239,7 +298,7 @@ namespace LicentaB.Controllers
                     PaymentTypeId = createPayload.PaymentTypeId
                 };
                 var foundCourse = _db.StudentEnrolments
-              .SingleOrDefault(u => u.CourseId == payment.CourseId);
+              .SingleOrDefault(u => u.CourseId == payment.CourseId && u.UserId == payment.UserId );
                 if (foundCourse == null)
                 {
 
@@ -252,13 +311,27 @@ namespace LicentaB.Controllers
 
                     return Ok(new { status = true, message = "Student Inrolat" });
                 }
-                else return Ok(new { status = true, message = "nu mere" });
+                else return Ok(new { status = false, message = "Nu functioneaza" });
             }
             catch (Exception e)
             {
                 return new JsonResult(new { err = e.Message });
             }
         }
+        [HttpGet("myCourses")]
+        public ActionResult<List<Course>> GetCourseByUser(Guid Id)
+        {
+            return _db.Courses
+                .Where(user => Id == user.UserId)
+                .ToList();
+        }
+        [HttpGet("getFileById")]
+        public FileResult getFileById(string file)
+        {
+            
+    return PhysicalFile($"E:/licentaFisier/{file}", "application/octet-stream", enableRangeProcessing: true);
+        }
+
 
 
     }
